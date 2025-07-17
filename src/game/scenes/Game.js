@@ -10,11 +10,11 @@ export class Game extends Scene
 
     create ()
     {
-        this.cameras.main.setBackgroundColor(0x00ff00);
+        this.cameras.main.setBackgroundColor(0x333333);
 
-        this.add.image(512, 384, 'background').setAlpha(0.5);
+        // this.add.image(512, 384, 'background').setAlpha(0.5);
 
-        this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
+        let name = this.add.text(320, 384, 'GAME', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
@@ -23,8 +23,16 @@ export class Game extends Scene
         EventBus.emit('current-scene-ready', this);
     }
 
+    // Work on game objects at each game step
+    update(time, delta) 
+    {
+
+    }
+
     changeScene ()
     {
-        this.scene.start('GameOver');
+        this.scene.run('EM');
+        this.scene.stop('UI');
+        this.scene.stop();
     }
 }

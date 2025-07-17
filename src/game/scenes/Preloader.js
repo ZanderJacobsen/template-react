@@ -31,12 +31,7 @@ export class Preloader extends Scene
     preload ()
     {
         //  Load the assets for the game - Replace with your own assets
-        // this.load.setPath('assets');
         this.load.pack('playableAssets', 'assets/assetsPack.json');
-        // console.log(this.load.pack)
-
-        // this.load.image('logo', 'BaseTemplate/logo.png');
-        // this.load.image('star', 'BaseTemplate/star.png');
     }
 
     create ()
@@ -45,7 +40,6 @@ export class Preloader extends Scene
         //  For example, you can define global animations here, so we can use them in other scenes.
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
-        this.scene.start('MainMenu');
-        console.log(Phaser.Cache.image)
+        this.scene.start('UI');
     }
 }
