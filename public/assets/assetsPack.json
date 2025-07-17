@@ -1,77 +1,77 @@
-[
-  {
-  "path": "assets/BaseTemplate",
-  "BaseTemplate": [
-    {
-      "type": "image",
-      "key": "debugBtn",
-      "url": "debugBtn.png"
-    },
-    {
-      "type": "image",
-      "key": "CTA",
-      "url": "CTA.png"
-    },
-    {
-      "type": "image",
-      "key": "background",
-      "url": "bg.png"
-    },
-    {
-      "type": "image",
-      "key": "star",
-      "url": "star.png"
-    },
-    {
-      "type": "image",
-      "key": "logo",
-      "url": "logo.png"
-    }
-  ]
-  },
-  {
-    "path": "assets/01_Art",
-    "Art": [
+{
+  "BaseTemplate": {
+    "path": "assets/BaseTemplate",
+    "defaultType": "image",
+    "files": [
       {
-        "type": "image",
+        "key": "debugBtn",
+        "url": "debugBtn.png"
+      },
+          {
+        "key": "debugBtn",
+        "url": "debugBtn.png"
+      },
+      {
+        "key": "CTA",
+        "url": "CTA.png"
+      },
+      {
+        "key": "background",
+        "url": "bg.png"
+      },
+      {
+        "key": "star",
+        "url": "star.png"
+      },
+      {
+        "key": "logo",
+        "url": "logo.png"
+      }
+    ]
+  },
+  
+  "Art": {
+    "path": "assets/01_Art",
+    "defaultType": "image",
+    "files": [
+      {
+        "key": "Blue",
+        "url": "Crystals/Blue.png"
+      },
+      {
         "key": "Emerald",
         "url": "Crystals/Emerald.png"
       },
       {
-        "type": "image",
         "key": "Green",
         "url": "Crystals/Green.png"
       },
       {
-        "type": "image",
         "key": "Orange",
         "url": "Crystals/Orange.png"
       },
       {
-        "type": "image",
         "key": "Pink",
         "url": "Crystals/Pink.png"
       },
       {
-        "type": "image",
         "key": "Red",
         "url": "Crystals/Red.png"
       },
       {
-        "type": "image",
         "key": "Yellow",
         "url": "Crystals/Yellow.png"
       },
       {
-        "type": "image",
         "key": "OrbWhite",
         "url": "OrbWhite.png"
       },
       {
-        "type": "image",
         "key": "Prompt",
         "url": "Prompt.png"
       }
     ]
-  }
-]
+}
+
+}
+
