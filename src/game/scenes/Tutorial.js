@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 
 export const TutorialMode = {
+    UNDEFINED: -1,
     NONE: 0,
     CTA: 1,
     CTAs: 2,
@@ -10,7 +11,7 @@ export const TutorialMode = {
 export class Tutorial extends Scene {
     handTween;
     f_hand;
-    target;
+    handTarget; offset;
     mode;
 
     constructor() {
@@ -20,26 +21,30 @@ export class Tutorial extends Scene {
     create() {
 
         this.f_hand = this.add.image(65, 65, 'debugBtn').setDepth(100).setOrigin(0.1);
-
-        let name = this.add.text(320, 200, 'Tutorial', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setDepth(100).setOrigin(0.5);
-
-        this.f_icon.setInteractive();
-        this.f_DL.setInteractive();
-        this.f_DL.on('pointerdown', () => this.redirect(this.f_DL));
-        this.f_icon.on('pointerdown', () => this.redirect(this.f_icon));
+        this.f_hand.alpha = 0;
 
         EventBus.emit('current-scene-ready', this);
+
+        this.setEvents('Game');
+        this.setEvents('UI');
+        this.setEvents('EM');
+        this.setEvents('RM');
+    }
+
+    setEvents(sceneName) {
+        this.scene.get(sceneName).events.on('setMode', this.setMode, this);
+        this.scene.get(sceneName).events.on('queueHand', this.queueHand, this);
+        this.scene.get(sceneName).events.on('stopHand', this.stopHand, this);
+    }
+
+    setMode(target, mode = TutorialMode.UNDEFINED, offset = null) {
+        this.handTarget = target;
+        this.mode = mode;
+        this.offset = offset ? offset : { x: target.width / 6, y: 20 };
     }
 
     stopHand(alphaOut = true, nullify = true) {
-        if (this.handTween) {
-            this.handTween.stop();
-            this.handTween = null;
-        }
+        this.tweens.killTweensOf([this.f_hand, this.handTarget]);
 
         this.f_hand.scale = 1;
 
@@ -52,36 +57,32 @@ export class Tutorial extends Scene {
         }
 
         if (nullify) {
-            this.target = null;
+            this.handTarget = null;
             this.mode = TutorialMode.NONE;
         }
     }
 
-    setMode(target, mode = TutorialMode.CTA) {
-        this.target = target;
-        this.mode = mode;
-    }
-
     queueHand(a = 1, dur = 300, del = 3700) {
+        console.log('queueHand', a, dur, del);
         this.stopHand(false, false);
         this.f_hand.setAlpha(0);
 
         this.handTween = this.tweens.add({
             targets: this.f_hand,
-            // x: { value: this.target.x, duration, ease: 'Sine.easeInOut' },
-            // y: { value: this.target.y, duration, ease: 'Sine.easeInOut' },
+            // x: { value: this.handTarget.x, duration, ease: 'Sine.easeInOut' },
+            // y: { value: this.handTarget.y, duration, ease: 'Sine.easeInOut' },
             alpha: a,
             duration: dur,
             delay: del,
-            onComplete: this.startTutorial,
+            onComplete: () => { this.startTutorial(); },
             onCompleteScope: this,
         });
     }
 
     startTutorial(target) {
         if (target)
-            this.target = target;
-        if (!this.target) {
+            this.handTarget = target;
+        if (!this.handTarget) {
             console.warn('No target set for tutorial');
             return;
         }
@@ -92,62 +93,103 @@ export class Tutorial extends Scene {
                 // Your logic for no tutorial
                 break;
             case TutorialMode.CTAs:
-
+                this.listLogic(speed);
                 break;
             default:
-                let { tx, ty } = this.target.getWorldTransformMatrix();
-                this.f_hand.setPosition(tx, ty);
+                this.ctaLogic(speed);
+        }
+    }
 
-                this.tweens.add({
+    listLogic(speed) {
+        let index = 0; let target = null;
+        let chain = this.tweens.chain({
+            targets: null,
+            repeat: -1,
+            tweens: [
+                {
                     targets: this.f_hand,
-                    scale: '-=.1',
-                    duration: speed / 6,
-                    // delay: speed / 3,
-                    ease: 'Quart',
-                    repeat: -1,
-                    repeatDelay: speed / 3,
+                    alpha: 1,
+                    duration: speed / 4,
+                    delay: 100,
+                    onStart: () => {
+                        target = this.handTarget.getAt(index);
+                        let { tx, ty } = target.getWorldTransformMatrix();
+                        this.tweens.add({
+                            targets: this.f_hand,
+                            x: { value: tx + this.offset.x, ease: 'Quad' },
+                            y: { value: ty + this.offset.y, ease: 'Linear' },
+                            duration: speed / 2,
+                        });
+                        index = (index + 1) % this.handTarget.length;
+                    }
+                },
+                {
+                    targets: this.f_hand,
+                    scale: '+=.1',
+                    duration: speed / 4,
                     yoyo: true,
-                    // hold: speed / 3,
+                    delay: 50,
+                },
+                {
+                    targets: this.f_hand,
+                    scale: '-=.2',
+                    duration: speed / 4,
+                    yoyo: true,
                     onYoyo: () => {
                         this.tweens.add({
-                            targets: this.target,
+                            targets: target,
                             scale: '-=.1',
-                            duration: speed / 3,
-                            delay: speed / 8,
-                            ease: 'Quart',
-                            loop: -1,
-                        })
-                    }
-                })
-        }
-    }
-
-    moveLogo(reactCallback) {
-        if (this.logoTween) {
-            if (this.logoTween.isPlaying()) {
-                this.logoTween.pause();
-            }
-            else {
-                this.logoTween.play();
-            }
-        }
-        else {
-            this.logoTween = this.tweens.add({
-                targets: this.logo,
-                x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
-                y: { value: 80, duration: 1500, ease: 'Sine.easeOut' },
-                yoyo: true,
-                repeat: -1,
-                onUpdate: () => {
-                    if (reactCallback) {
-                        reactCallback({
-                            x: Math.floor(this.logo.x),
-                            y: Math.floor(this.logo.y)
+                            yoyo: true,
+                            ease: 'Quad',
+                            duration: speed / 4,
                         });
+                        if (target.glow)
+                            this.tweens.add({
+                                targets: target.glow,
+                                alpha: 1,
+                                yoyo: true,
+                                ease: 'Quad',
+                                duration: speed / 2,
+                            });
                     }
                 }
-            });
-        }
+            ],
+        });
     }
 
+    ctaLogic(speed) {
+        let { tx, ty } = this.handTarget.getWorldTransformMatrix();
+        this.f_hand.setPosition(tx + this.offset.x, ty + this.offset.y);
+        this.f_hand.alpha = 1;
+        // let ogScale = this.handTarget.scale;
+        let counter = -1;
+
+        let t = this.tweens.add({
+            targets: this.f_hand,
+            scale: '-=.1',
+            duration: speed / 2,
+            // delay: speed / 3,
+            ease: 'Quart',
+            repeat: -1,
+            repeatDelay: speed / 8,
+            yoyo: true,
+            // hold: speed / 3,
+            onYoyo: () => {
+                if (this.mode !== TutorialMode.CTA) return;
+                // this.handTarget.scale = ogScale;
+                if (counter % 2) {
+                    this.tweens.killTweensOf(this.handTarget);
+                    this.tweens.add({
+                        targets: this.handTarget,
+                        scale: '-=.1',
+                        duration: speed / 4,
+                        // delay: speed / 8,
+                        ease: 'Circ',
+                        yoyo: true,
+                    })
+                }
+                counter++;
+            }
+        })
+    }
 }

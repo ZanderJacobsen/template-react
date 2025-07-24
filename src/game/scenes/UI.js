@@ -1,20 +1,17 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 
-export class UI extends Scene
-{
+export class UI extends Scene {
     logoTween;
     f_DL; f_icon;
     f_layer;
 
-    constructor ()
-    {
+    constructor() {
         super('UI');
         // this.isLoaded = false;
     }
 
-    create ()
-    {
+    create() {
         this.f_layer = this.add.image(320, 569, 'background').alpha = 0.25;
 
         this.f_icon = this.add.image(65, 65, 'debugBtn').setDepth(100);
@@ -26,14 +23,14 @@ export class UI extends Scene
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setDepth(100).setOrigin(0.5);
-        
+
         this.scene.run('Game');
-        
+
         this.f_icon.setInteractive();
         this.f_DL.setInteractive();
         this.f_DL.on('pointerdown', () => this.redirect(this.f_DL));
         this.f_icon.on('pointerdown', () => this.redirect(this.f_icon));
-        
+
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -48,21 +45,16 @@ export class UI extends Scene
     //     this.scene.start('EM');
     // }
 
-    moveLogo (reactCallback)
-    {
-        if (this.logoTween)
-        {
-            if (this.logoTween.isPlaying())
-            {
+    moveLogo(reactCallback) {
+        if (this.logoTween) {
+            if (this.logoTween.isPlaying()) {
                 this.logoTween.pause();
             }
-            else
-            {
+            else {
                 this.logoTween.play();
             }
         }
-        else
-        {
+        else {
             this.logoTween = this.tweens.add({
                 targets: this.logo,
                 x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
@@ -70,8 +62,7 @@ export class UI extends Scene
                 yoyo: true,
                 repeat: -1,
                 onUpdate: () => {
-                    if (reactCallback)
-                    {
+                    if (reactCallback) {
                         reactCallback({
                             x: Math.floor(this.logo.x),
                             y: Math.floor(this.logo.y)
@@ -82,8 +73,7 @@ export class UI extends Scene
         }
     }
 
-    redirect (btn)
-    {
+    redirect(btn) {
         console.log('UI Redirect:', btn);
         let text = this.add.text(320, 25, 'REDIRECT', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
