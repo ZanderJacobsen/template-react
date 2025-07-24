@@ -3,6 +3,7 @@ import { Game } from './scenes/Game';
 import { EM } from './scenes/EM';
 import { RM } from './scenes/RM';
 import { UI } from './scenes/UI';
+import { Tutorial } from './scenes/Tutorial';
 import Phaser from 'phaser';
 import { Preloader } from './scenes/Preloader';
 
@@ -20,7 +21,8 @@ const config = {
         Game,
         UI,
         EM,
-        RM
+        RM,
+        Tutorial
     ]
 };
 
